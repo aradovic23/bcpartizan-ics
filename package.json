@@ -4,7 +4,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "lint": "eslint src/**/*.js"
   },
   "keywords": [
     "partizan",
@@ -18,11 +19,13 @@
   "description": "KK Partizan basketball schedule ICS calendar subscription service",
   "dependencies": {
     "axios": "^1.12.2",
-    "cheerio": "^1.1.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "ics": "^3.8.1",
     "node-cron": "^4.2.1"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "devDependencies": {
+    "eslint": "^9.37.0"
+  }
 }

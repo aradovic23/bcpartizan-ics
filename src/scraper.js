@@ -1,5 +1,4 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
 const config = require('./config');
 
 function getVenueForTeam(teamName) {
@@ -23,19 +22,19 @@ function getVenueForTeam(teamName) {
     'Baskonia': 'Buesa Arena, Vitoria-Gasteiz, Spain',
     'Valencia': 'La Fonteta, Valencia, Spain'
   };
-  
+
   for (const [team, venue] of Object.entries(venues)) {
     if (teamName?.includes(team)) {
       return venue;
     }
   }
-  
+
   return `${teamName} Arena`;
 }
 
 function parseFlashScoreData(html) {
   const games = [];
-  
+
   const dataMatch = html.match(/data:\s*`([^`]+)`/);
   if (!dataMatch) return games;
 
@@ -48,14 +47,14 @@ function parseFlashScoreData(html) {
 
     const fields = {};
     const pairs = block.split('¬');
-    
+
     for (const pair of pairs) {
       const [key, value] = pair.split('÷');
       if (key && value) {
         fields[key] = value;
       }
     }
-    
+
     const nextBlock = i < gameBlocks.length - 1 ? gameBlocks[i + 1] : '';
     const venueMatch = nextBlock.match(/AM÷([^¬]+)/);
     let venue = venueMatch ? venueMatch[1].replace('Neutral location - ', '').replace(/\.$/, '') : null;
@@ -68,11 +67,11 @@ function parseFlashScoreData(html) {
 
     if ((homeTeam?.includes(config.team) || awayTeam?.includes(config.team)) && timestamp) {
       const date = new Date(parseInt(timestamp) * 1000);
-      
+
       if (!venue || venue.includes('TBD')) {
         venue = getVenueForTeam(homeTeam);
       }
-      
+
       games.push({
         competition: competition || 'Euroleague',
         homeTeam: homeTeam || 'Unknown',
@@ -107,14 +106,14 @@ async function fetchFlashScoreSchedule(url, competition) {
 
 function deduplicateGames(games) {
   const seen = new Map();
-  
+
   for (const game of games) {
     const key = `${game.date}-${game.time}-${game.homeTeam}-${game.awayTeam}`;
     if (!seen.has(key)) {
       seen.set(key, game);
     }
   }
-  
+
   return Array.from(seen.values());
 }
 
@@ -134,7 +133,7 @@ async function fetchEuroleagueSchedule() {
 
     const games = response.data.data;
     const now = new Date();
-    
+
     const futureGames = games
       .filter(game => new Date(game.date) >= now)
       .map(game => ({
@@ -143,11 +142,11 @@ async function fetchEuroleagueSchedule() {
         awayTeam: game.away.abbreviatedName || game.away.name,
         date: new Date(game.date).toISOString().split('T')[0],
         time: new Date(game.date).toTimeString().slice(0, 5),
-        venue: game.venue?.name && game.venue?.address 
-          ? `${game.venue.name}, ${game.venue.address}` 
+        venue: game.venue?.name && game.venue?.address
+          ? `${game.venue.name}, ${game.venue.address}`
           : game.venue?.name || getVenueForTeam(game.home.name),
-        location: game.venue?.name && game.venue?.address 
-          ? `${game.venue.name}, ${game.venue.address}` 
+        location: game.venue?.name && game.venue?.address
+          ? `${game.venue.name}, ${game.venue.address}`
           : game.venue?.name || getVenueForTeam(game.home.name),
         round: game.round?.name || '',
         source: 'euroleague-api'
@@ -165,15 +164,15 @@ async function fetchABALeagueSchedule() {
     fetchFlashScoreSchedule(config.flashscoreABAFixturesUrl, 'ABA League'),
     fetchFlashScoreSchedule(config.flashscoreABAResultsUrl, 'ABA League')
   ]);
-  
+
   const allGames = [...fixtures, ...results];
   const now = new Date();
-  
+
   const futureGames = allGames.filter(game => {
     const gameDate = new Date(game.date + ' ' + game.time);
     return gameDate >= now;
   });
-  
+
   return deduplicateGames(futureGames);
 }
 
@@ -199,11 +198,11 @@ function getMockSchedule() {
   for (let i = 0; i < 10; i++) {
     const gameDate = new Date(now);
     gameDate.setDate(gameDate.getDate() + (i * 7));
-    
+
     const opponents = ['Real Madrid', 'Barcelona', 'Olimpia Milano', 'Fenerbahce', 'Crvena Zvezda', 'Maccabi', 'Bayern Munich', 'Zalgiris'];
     const opponent = opponents[i % opponents.length];
     const isHome = i % 2 === 0;
-    
+
     games.push({
       competition: i % 3 === 0 ? 'Euroleague' : 'ABA League',
       homeTeam: isHome ? 'Partizan' : opponent,
@@ -223,3 +222,4 @@ module.exports = {
   fetchAllSchedules,
   getMockSchedule
 };
+
