@@ -176,59 +176,6 @@ Edit `src/icsGenerator.js` to modify:
 
 ## Deployment
 
-### Deploy to Render.com (Recommended) 🚀
-
-Render.com offers **free hosting** perfect for sharing with friends. No credit card required!
-
-#### Step 1: Create GitHub Repository
-
-1. Go to [github.com/new](https://github.com/new)
-2. Name: `bcpartizan-ics` (or any name you prefer)
-3. Keep it **Public** or **Private** (your choice)
-4. **DON'T** initialize with README (we already have files)
-5. Click **Create repository**
-
-#### Step 2: Push Your Code to GitHub
-
-```bash
-cd /Users/milicacurcic/dev/bcpartizan-ics
-
-# Add your GitHub repository URL (replace YOUR_USERNAME)
-git remote add origin https://github.com/YOUR_USERNAME/bcpartizan-ics.git
-
-# Commit all files
-git add .
-git commit -m "Initial commit: Partizan ICS Calendar"
-
-# Push to GitHub
-git branch -M main
-git push -u origin main
-```
-
-#### Step 3: Deploy on Render
-
-1. **Sign up** at [render.com](https://render.com) (free, use GitHub login)
-2. Click **"New +"** → **"Web Service"**
-3. Click **"Connect GitHub"** and authorize Render
-4. Find and select your `bcpartizan-ics` repository
-5. Render auto-detects settings from `render.yaml` ✨
-6. Click **"Create Web Service"**
-7. Wait 2-3 minutes for deployment ⏱️
-
-#### Step 4: Get Your Calendar URL 🎉
-
-Once deployed (look for "Live" badge), you'll get a URL like:
-```
-https://partizan-ics-calendar.onrender.com
-```
-
-**Your calendar subscription URL:**
-```
-https://partizan-ics-calendar.onrender.com/calendar.ics
-```
-
-Share this URL with your friends!
-
 ---
 
 ### 📱 How Friends Can Subscribe
@@ -345,4 +292,4 @@ For issues or questions about KK Partizan, visit their official website.
 
 ---
 
-**Idemo Partizan!** 🖤🤍
+**Partizane napadaj!** 🖤🤍

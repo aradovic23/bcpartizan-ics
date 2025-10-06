@@ -16,7 +16,7 @@
 Open Terminal and run these commands:
 
 ```bash
-cd /Users/milicacurcic/dev/bcpartizan-ics
+cd /Users/user_name/dev/bcpartizan-ics
 
 # Add your GitHub URL (REPLACE with your actual URL from step 1)
 git remote add origin https://github.com/YOUR_USERNAME/bcpartizan-ics.git
@@ -33,31 +33,6 @@ git push -u origin main
 ```
 
 **Note:** GitHub might ask for authentication. Use a personal access token if needed.
-
-### 3️⃣ Deploy on Render.com (3 minutes)
-
-1. **Sign up** at https://render.com
-   - Click "Get Started for Free"
-   - Use "Sign in with GitHub" (easiest)
-
-2. **Create Web Service**
-   - Click **"New +"** button (top right)
-   - Select **"Web Service"**
-
-3. **Connect Repository**
-   - Click **"Connect GitHub"**
-   - Authorize Render to access your repositories
-   - Find and select `bcpartizan-ics` repository
-
-4. **Configure (Auto-detected!)**
-   - Render reads the `render.yaml` file automatically
-   - Just click **"Create Web Service"**
-   - No manual configuration needed! ✨
-
-5. **Wait for Deployment**
-   - Watch the build logs (2-3 minutes)
-   - Look for "Live" badge at the top
-   - You're done! 🎉
 
 ### 4️⃣ Get Your Calendar URL
 
