@@ -65,9 +65,9 @@ func parseFlashScoreData(html, team string) []types.Game {
 		}
 
 		fields := make(map[string]string)
-		pairs := strings.SplitSeq(block, "¬")
+		pairs := strings.Split(block, "¬")
 
-		for pair := range pairs {
+		for _, pair := range pairs {
 			parts := strings.Split(pair, "÷")
 			if len(parts) == 2 {
 				fields[parts[0]] = parts[1]
