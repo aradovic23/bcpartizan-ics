@@ -18,7 +18,13 @@ function generateCalendar(games) {
     
     const title = `${game.competition} - ${game.homeTeam} vs ${game.awayTeam}`;
     
-    const description = `${game.competition}\n${game.homeTeam} vs ${game.awayTeam}`;
+    let description = `${game.competition}\n${game.homeTeam} vs ${game.awayTeam}`;
+    if (game.round) {
+      description += `\n${game.round}`;
+    }
+    if (game.venue || game.location) {
+      description += `\nVenue: ${game.location || game.venue}`;
+    }
     
     return {
       start: [
@@ -39,6 +45,11 @@ function generateCalendar(games) {
           action: 'display',
           description: `${title} starts in 30 minutes`,
           trigger: { minutes: 30, before: true }
+        },
+        {
+          action: 'display',
+          description: `${title} starts in 5 minutes`,
+          trigger: { minutes: 5, before: true }
         }
       ]
     };
