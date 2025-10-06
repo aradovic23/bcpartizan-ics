@@ -1,26 +1,65 @@
 # Agent Guidelines for bcpartizan-ics
 
 ## Build/Run/Test Commands
-- **Start server**: `npm start` or `node src/index.js`
-- **Dev mode**: `npm run dev`
-- **No tests configured** - project does not have a test suite
+- **Build**: `go build -o partizan-ics`
+- **Run**: `./partizan-ics`
+- **Test**: `go test ./...` (no tests configured yet)
+- **Format**: `go fmt ./...`
+- **Lint**: `go vet ./...`
 
 ## Code Style
 
-**Language**: JavaScript (Node.js), no TypeScript
+**Language**: Go 1.23+
 
-**Imports**: Use CommonJS (`require`/`module.exports`)
+**Package Organization**: 
+- Each package in its own directory
+- Package name matches directory name
+- Main package in root (`main.go`)
 
-**Error Handling**: Use try-catch blocks, log errors with `console.error()`, return fallback data (mock schedule) on failures
+**Imports**: 
+- Standard library first
+- Third-party packages second
+- Local packages last
+- Group with blank lines
 
-**Naming**: camelCase for functions/variables, SCREAMING_SNAKE_CASE for constants (e.g., `CACHE_FILE`)
+**Error Handling**: 
+- Always check errors, never ignore
+- Log errors with `log.Printf()` or `log.Println()`
+- Return fallback data (mock schedule) on scraper failures
+- Use error wrapping with `fmt.Errorf()` when appropriate
 
-**Formatting**: 2-space indentation, single quotes for strings where possible
+**Naming**: 
+- Exported: PascalCase (e.g., `FetchAllSchedules`, `Config`)
+- Unexported: camelCase (e.g., `fetchEuroleagueSchedule`, `cacheMutex`)
+- Constants: PascalCase or camelCase depending on export
+- Acronyms: Keep uppercase (e.g., `URL`, `HTTP`, `ICS`)
 
-**Async/Await**: Prefer async/await over promises, use `Promise.all()` for parallel operations
+**Formatting**: 
+- Use `gofmt` (tabs for indentation)
+- Follow standard Go conventions
+- Keep line length reasonable
 
-**Configuration**: All config in `src/config.js`, use `process.env` with defaults
+**Concurrency**:
+- Use `sync.RWMutex` for shared cache access
+- Goroutines for parallel HTTP requests where appropriate
+- Channels for communication between goroutines
 
-**File Structure**: Modular - separate files for scraper, ICS generation, cache, config
+**Configuration**: 
+- All config in `config/config.go`
+- Use `os.Getenv()` with defaults
+- Load `.env` with `godotenv.Load()`
 
-**Comments**: Minimal - code should be self-documenting
+**File Structure**: 
+- Modular packages: `config/`, `cache/`, `scraper/`, `ics/`, `types/`
+- Each package has clear responsibility
+- Shared types in `types/` package
+
+**Comments**: 
+- Minimal inline comments - code should be self-documenting
+- Package-level documentation for exported functions
+- Document complex logic only
+
+**Dependencies**:
+- `github.com/arran4/golang-ical` - ICS generation
+- `github.com/joho/godotenv` - .env file loading
+- `github.com/robfig/cron/v3` - Scheduled tasks

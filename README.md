@@ -1,6 +1,6 @@
 # 🏀 KK Partizan Basketball Schedule - ICS Calendar
 
-Automatically sync KK Partizan basketball games across all competitions to your calendar app. This app fetches schedules from Euroleague, ABA League, and other competitions, and provides an ICS subscription URL you can add to any calendar application.
+Automatically sync KK Partizan basketball games across all competitions to your calendar app. This Go application fetches schedules from Euroleague, ABA League, and other competitions, and provides an ICS subscription URL you can add to any calendar application.
 
 ## Features
 
@@ -11,13 +11,17 @@ Automatically sync KK Partizan basketball games across all competitions to your 
 - ✅ **Auto-refresh**: Schedule updates every 2 days
 - ✅ **Caching**: Reduces unnecessary API calls
 - ✅ **Real-time data**: Fetches from FlashScore for accurate game info
+- ✅ **Single binary**: No dependencies, easy deployment
 
 ## Quick Start
+
+### Prerequisites
+- Go 1.23 or higher
 
 ### Installation
 
 ```bash
-npm install
+go build -o partizan-ics
 ```
 
 ### Configuration
@@ -30,27 +34,12 @@ cp .env.example .env
 
 Edit `.env` if you want to customize:
 - `PORT`: Server port (default: 3000)
-- `CACHE_REFRESH_INTERVAL`: Cron expression for refresh schedule (default: every 2 days at midnight)
+- `CACHE_REFRESH_INTERVAL`: Cron expression for refresh schedule (default: `0 0 */2 * *` - every 2 days at midnight)
 
 ### Running the Server
 
 ```bash
-node src/index.js
-```
-
-Or add to `package.json`:
-
-```json
-"scripts": {
-  "start": "node src/index.js",
-  "dev": "nodemon src/index.js"
-}
-```
-
-Then run:
-
-```bash
-npm start
+./partizan-ics
 ```
 
 The server will start on `http://localhost:3000`
@@ -96,7 +85,7 @@ Each calendar event includes:
   - Example: "Euroleague - Partizan vs Real Madrid"
 - **Location**: Full venue name and address
 - **Duration**: 2 hours (typical game duration)
-- **Reminder**: 30 minutes before game starts
+- **Reminders**: 30 minutes and 5 minutes before game starts
 - **Status**: Confirmed
 
 ## Data Sources
@@ -130,111 +119,95 @@ The app fetches schedules from **reliable official sources**:
 
 ```
 bcpartizan-ics/
-├── src/
-│   ├── index.js         # Express server & main app
-│   ├── scraper.js       # Schedule fetching logic
-│   ├── icsGenerator.js  # ICS calendar generation
-│   ├── cache.js         # Caching mechanism
-│   └── config.js        # Configuration
+├── main.go              # HTTP server & main app
+├── config/
+│   └── config.go        # Configuration
+├── cache/
+│   └── cache.go         # Caching mechanism
+├── scraper/
+│   └── scraper.go       # Schedule fetching logic
+├── ics/
+│   └── generator.go     # ICS calendar generation
+├── types/
+│   └── types.go         # Shared data types
 ├── data/
 │   └── cache.json       # Cached schedule data
 ├── .env                 # Environment variables
-├── .gitignore
-└── package.json
+├── Dockerfile           # Docker build configuration
+├── go.mod               # Go dependencies
+└── go.sum               # Go dependency checksums
 ```
 
 ## Development
 
 ### Adding New Data Sources
 
-Edit `src/scraper.js` and add a new fetch function:
+Edit `scraper/scraper.go` and add a new fetch function:
 
-```javascript
-async function fetchNewCompetition() {
+```go
+func fetchNewCompetition(cfg *config.Config) []types.Game {
   // Your scraping logic
-  return games;
+  return games
 }
 ```
 
-Then add it to `fetchAllSchedules()`:
+Then add it to `FetchAllSchedules()`:
 
-```javascript
-const [euroleague, aba, newComp] = await Promise.all([
-  fetchEuroleagueSchedule(),
-  fetchABALeagueSchedule(),
-  fetchNewCompetition()
-]);
+```go
+func FetchAllSchedules(cfg *config.Config) []types.Game {
+  euroleagueGames := fetchEuroleagueSchedule(cfg)
+  abaGames := fetchABALeagueSchedule(cfg)
+  newGames := fetchNewCompetition(cfg)
+  
+  allGames := append(euroleagueGames, abaGames...)
+  allGames = append(allGames, newGames...)
+  // ... sorting logic
+}
 ```
 
 ### Customizing Event Format
 
-Edit `src/icsGenerator.js` to modify:
+Edit `ics/generator.go` to modify:
 - Event titles
 - Duration
 - Reminder timing
 - Description format
 
+### Building
+
+```bash
+# Build for current platform
+go build -o partizan-ics
+
+# Cross-compile for Linux
+GOOS=linux GOARCH=amd64 go build -o partizan-ics-linux
+
+# Cross-compile for Windows
+GOOS=windows GOARCH=amd64 go build -o partizan-ics.exe
+```
+
 ## Deployment
 
----
+### Docker
 
-### 📱 How Friends Can Subscribe
+The project includes a multi-stage Dockerfile for optimized builds:
 
-**Apple Calendar (iPhone/Mac):**
-1. Open Calendar app
-2. File → New Calendar Subscription (Mac) or Settings → Accounts → Add Account → Other (iPhone)
-3. Paste: `https://YOUR-APP.onrender.com/calendar.ics`
-4. Set refresh: Hourly or Daily
+```bash
+docker build -t partizan-ics .
+docker run -p 3000:3000 partizan-ics
+```
 
-**Google Calendar:**
-1. Open [calendar.google.com](https://calendar.google.com)
-2. Click **"+"** next to "Other calendars"
-3. Select **"From URL"**
-4. Paste: `https://YOUR-APP.onrender.com/calendar.ics`
-
-**Outlook:**
-1. Open Outlook Calendar
-2. Add Calendar → Subscribe from web
-3. Paste: `https://YOUR-APP.onrender.com/calendar.ics`
-
----
-
-### ⚠️ Important Notes About Free Tier
-
-**Service Sleep:**
-- Free tier spins down after 15 min of inactivity
-- First request after sleep takes ~30-60 seconds (cold start)
-- **This is fine for calendars!** Calendar apps will wait for the response
-
-**Keeping It Active (Optional):**
-If you want faster responses, use [UptimeRobot](https://uptimerobot.com) (free) to ping your service every 10 minutes:
-- Add Monitor → HTTP(s)
-- URL: `https://YOUR-APP.onrender.com/`
-- Interval: 5 minutes
-
-**No Configuration Needed:**
-- PORT is automatically set by Render
-- All environment variables are pre-configured
-- Just deploy and go! 🚀
-
----
-
-### Alternative Deployment Options
-
-<details>
-<summary><b>Railway.app</b></summary>
+### Railway.app
 
 1. Sign up at [railway.app](https://railway.app)
 2. New Project → Deploy from GitHub
 3. Select your repository
-4. Railway auto-deploys
+4. Railway auto-detects Go and deploys
 5. Get public URL from dashboard
 
 **Cost:** $5 credit/month (free tier)
-</details>
 
-<details>
-<summary><b>Fly.io</b></summary>
+### Fly.io
 
 1. Install CLI: `brew install flyctl`
 2. Run: `fly launch`
@@ -242,28 +215,41 @@ If you want faster responses, use [UptimeRobot](https://uptimerobot.com) (free) 
 4. Deploy: `fly deploy`
 
 **Cost:** Free tier includes 3 VMs
-</details>
 
-<details>
-<summary><b>Docker (Self-hosted)</b></summary>
+### Render.com
 
-Create `Dockerfile`:
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --production
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+1. Sign up at [render.com](https://render.com)
+2. New → Web Service
+3. Connect your GitHub repository
+4. Render auto-detects Go
+5. Deploy!
 
-Build and run:
-```bash
-docker build -t partizan-ics .
-docker run -p 3000:3000 partizan-ics
-```
-</details>
+**Cost:** Free tier available
+
+---
+
+### 📱 How to Share With Friends
+
+Once deployed, share this URL: `https://YOUR-APP.com/calendar.ics`
+
+**Apple Calendar (iPhone/Mac):**
+1. Open Calendar app
+2. File → New Calendar Subscription (Mac) or Settings → Accounts → Add Account → Other (iPhone)
+3. Paste the URL
+4. Set refresh: Hourly or Daily
+
+**Google Calendar:**
+1. Open [calendar.google.com](https://calendar.google.com)
+2. Click **"+"** next to "Other calendars"
+3. Select **"From URL"**
+4. Paste the URL
+
+**Outlook:**
+1. Open Outlook Calendar
+2. Add Calendar → Subscribe from web
+3. Paste the URL
+
+---
 
 ## Troubleshooting
 
@@ -281,6 +267,11 @@ docker run -p 3000:3000 partizan-ics
 - Ensure your server is publicly accessible (not localhost)
 - Use HTTPS in production for better compatibility
 - Check if your calendar app supports HTTP subscriptions
+
+**Build errors?**
+- Make sure you have Go 1.23+ installed: `go version`
+- Run `go mod tidy` to sync dependencies
+- Check that all files are present
 
 ## License
 
