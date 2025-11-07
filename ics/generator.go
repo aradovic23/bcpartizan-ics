@@ -31,7 +31,7 @@ func GenerateCalendar(games []types.Game, cfg *config.Config) (string, error) {
 		event.SetStartAt(startTime)
 		event.SetEndAt(endTime)
 
-		title := fmt.Sprintf("%s - %s vs %s", game.Competition, game.HomeTeam, game.AwayTeam)
+		title := fmt.Sprintf("🏀 %s - %s vs %s", game.Competition, game.HomeTeam, game.AwayTeam)
 		event.SetSummary(title)
 
 		var description strings.Builder
