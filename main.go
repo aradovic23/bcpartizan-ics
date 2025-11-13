@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/milicacurcic/bcpartizan-ics/cache"
@@ -97,6 +98,20 @@ func refreshHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	cacheMutex.RLock()
+	gameCount := len(cachedGames)
+	cacheMutex.RUnlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":       "healthy",
+		"timestamp":    time.Now().UTC().Format(time.RFC3339),
+		"games_cached": gameCount,
+	})
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	host := r.Host
 	scheme := "http"
@@ -158,6 +173,7 @@ func main() {
 	http.HandleFunc("/calendar.ics", calendarHandler)
 	http.HandleFunc("/games", gamesHandler)
 	http.HandleFunc("/refresh", refreshHandler)
+	http.HandleFunc("/health", healthHandler)
 
 	log.Printf("Partizan ICS Calendar Server running on port %s", cfg.Port)
 	log.Printf("Calendar URL: http://localhost:%s/calendar.ics", cfg.Port)
