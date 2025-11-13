@@ -12,7 +12,12 @@ import (
 
 func GenerateCalendar(games []types.Game, cfg *config.Config) (string, error) {
 	cal := ics.NewCalendar()
-	cal.SetMethod(ics.MethodRequest)
+	cal.SetMethod(ics.MethodPublish)
+	cal.SetName("KK Partizan Basketball Schedule")
+	cal.SetXWRCalName("KK Partizan Basketball Schedule")
+	cal.SetXWRCalDesc("Partizan basketball games across Euroleague, ABA League, and domestic competitions")
+	cal.SetXWRTimezone("Europe/Belgrade")
+	cal.SetRefreshInterval("PT6H")
 
 	for _, game := range games {
 		event := cal.AddEvent(fmt.Sprintf("%s-%s-%s@partizan-ics", game.Date, game.HomeTeam, game.AwayTeam))
@@ -52,6 +57,7 @@ func GenerateCalendar(games []types.Game, cfg *config.Config) (string, error) {
 				description.WriteString(game.Venue)
 			}
 		}
+		description.WriteString("\n\n---\n📅 Calendar: http://bcpartizan-ics.up.railway.app/calendar.ics")
 		event.SetDescription(description.String())
 
 		if game.Location != "" {

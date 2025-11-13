@@ -73,7 +73,7 @@ func calendarHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/calendar; charset=utf-8")
-	w.Header().Set("Content-Disposition", "attachment; filename=\"partizan-schedule.ics\"")
+	w.Header().Set("Cache-Control", "max-age=3600")
 	w.Write([]byte(icsContent))
 }
 
